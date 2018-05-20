@@ -42,9 +42,10 @@ class DMARCStorage(object):
         self._cur.execute("""CREATE TABLE IF NOT EXISTS dmarc_spf_results (
                                 report_id VARCHAR(255),
                                 record_id INTEGER,
+                                spf_id INTEGER,
                                 domain TEXT,
                                 result TEXT,
-                                PRIMARY KEY (report_id, record_id),
+                                PRIMARY KEY (report_id, record_id, spf_id),
                                 FOREIGN KEY (report_id, record_id)
                                     REFERENCES dmarc_records(report_id, record_id)
                                     ON DELETE CASCADE
@@ -76,8 +77,9 @@ class DMARCStorage(object):
                                rec.spf_pass, rec.dkim_pass, rec.header_from, rec.envelope_from,
                                rec.count])
             # Persist the SPF data:
-            self._cur.execute("INSERT INTO dmarc_spf_results VALUES (%s,%s,%s,%s);",
-                              [report.id, rec_id, rec.spf_result["domain"], rec.spf_result["result"]])
+            for spf_id, spf_result in enumerate(rec.spf_results):
+                self._cur.execute("INSERT INTO dmarc_spf_results VALUES (%s,%s,%s,%s,%s);",
+                                  [report.id, rec_id, spf_id, spf_result["domain"], spf_result["result"]])
             # Persist all the DKIM signatures with generated IDs
             for sig_id, sig in enumerate(rec.dkim_signatures):
                 self._cur.execute("INSERT INTO dmarc_dkim_signatures VALUES (%s,%s,%s,%s,%s,%s);",

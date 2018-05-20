@@ -42,13 +42,16 @@ class DMARCRecord(object):
         self.header_from = str(record_xml.identifiers.header_from.text) if record_xml.identifiers.header_from else None
         self.envelope_from = str(record_xml.identifiers.envelope_from.text) if record_xml.identifiers.envelope_from else None
         self.count = int(record_xml.find('count').text)
+
         # SPF Status:
-        try:
-            spf_result = str(record_xml.auth_results.spf.result.text)
-            spf_domain = str(record_xml.auth_results.spf.domain.text)
-            self.spf_result = dict(domain=spf_domain, result=spf_result)
-        except AttributeError:
-            self.auth_spf = None
+        xml_spf_results = record_xml.auth_results.find_all("spf") or []
+        self.spf_results = []
+        for spf_result in xml_spf_results:
+            _result = str(spf_result.result.text)
+            _domain = str(spf_result.domain.text)
+            self.spf_results.append(dict(domain=_domain, result=_result))
+
+        # DKIM:
         xml_dkim_signatures = record_xml.auth_results.find_all("dkim") or []
         self.dkim_signatures = []
         for dkim_sig in xml_dkim_signatures:
