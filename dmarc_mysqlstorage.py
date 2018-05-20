@@ -28,14 +28,14 @@ class DMARCStorage(object):
         self._cur.execute("""CREATE TABLE IF NOT EXISTS dmarc_records (
                                 report_id VARCHAR(255) REFERENCES dmarc_reports(report_id) ON DELETE CASCADE,
                                 record_id INTEGER,
-                                ip_address TEXT,
-                                hostname TEXT,
-                                disposition TEXT,
-                                reason TEXT,
-                                spf_pass INTEGER,
-                                dkim_pass INTEGER,
-                                header_from TEXT,
-                                envelope_from TEXT,
+                                ip_address VARCHAR(255),
+                                hostname VARCHAR(255),
+                                disposition VARCHAR(20),
+                                reason VARCHAR(20),
+                                spf_pass BOOLEAN,
+                                dkim_pass BOOLEAN,
+                                header_from VARCHAR(255),
+                                envelope_from VARCHAR(255),
                                 count INTEGER,
                                 PRIMARY KEY (report_id, record_id)
                             );""")
@@ -43,8 +43,8 @@ class DMARCStorage(object):
                                 report_id VARCHAR(255),
                                 record_id INTEGER,
                                 spf_id INTEGER,
-                                domain TEXT,
-                                result TEXT,
+                                domain VARCHAR(255),
+                                result VARCHAR(20),
                                 PRIMARY KEY (report_id, record_id, spf_id),
                                 FOREIGN KEY (report_id, record_id)
                                     REFERENCES dmarc_records(report_id, record_id)
@@ -55,8 +55,9 @@ class DMARCStorage(object):
                                 record_id INTEGER,
                                 signature_id INTEGER,
                                 domain VARCHAR(255),
-                                result VARCHAR(255),
-                                selector VARCHAR(255),
+                                result VARCHAR(20),
+                                selector VARCHAR(20),
+                                human_result VARCHAR(255),
                                 PRIMARY KEY (report_id, record_id, signature_id),
                                 FOREIGN KEY (report_id, record_id)
                                     REFERENCES dmarc_records(report_id, record_id)
@@ -82,5 +83,5 @@ class DMARCStorage(object):
                                   [report.id, rec_id, spf_id, spf_result["domain"], spf_result["result"]])
             # Persist all the DKIM signatures with generated IDs
             for sig_id, sig in enumerate(rec.dkim_signatures):
-                self._cur.execute("INSERT INTO dmarc_dkim_signatures VALUES (%s,%s,%s,%s,%s,%s);",
-                                  [report.id, rec_id, sig_id, sig["domain"], sig["result"], sig["selector"]])
+                self._cur.execute("INSERT INTO dmarc_dkim_signatures VALUES (%s,%s,%s,%s,%s,%s,%s);",
+                                  [report.id, rec_id, sig_id, sig["domain"], sig["result"], sig["selector"], sig["human_result"]])

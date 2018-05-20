@@ -58,8 +58,9 @@ class DMARCRecord(object):
             _result = str(dkim_sig.result.text)
             _domain = str(dkim_sig.domain.text)
             _selector = str(dkim_sig.selector.text) if dkim_sig.selector is not None else None
+            _human_result = str(dkim_sig.human_result.text) if dkim_sig.human_result is not None else None
             if _result not in ["none", "neutral"] and _domain != "not.evaluated":
-                self.dkim_signatures.append(dict(result=_result, domain=_domain, selector=_selector))
+                self.dkim_signatures.append(dict(result=_result, domain=_domain, selector=_selector, human_result=_human_result))
 
 
 class DMARCReport(object):
