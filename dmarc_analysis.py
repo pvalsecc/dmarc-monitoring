@@ -101,43 +101,43 @@ def generate_report(n_reports, min_time, max_time, by_disposition, by_host, by_r
 
     report += "Sender Hostname".ljust(LJUST) + "|" + "Sent".rjust(RJUST) + "\n"
     report += "=" * LINELENGTH + "\n"
-    for host in sorted(by_host.keys(), key=lambda x: by_host[x], reverse=True)[:TOPN]:
+    for host in sorted(list(by_host.keys()), key=lambda x: by_host[x], reverse=True)[:TOPN]:
         report += host.ljust(LJUST) + "|" + str(by_host[host]).rjust(RJUST) + "\n"
     if len(by_host) > TOPN:
         report += "...".ljust(LJUST) + "|" + "...".rjust(RJUST) + "\n"
-        others = sum(sorted(by_host.values(), reverse=True)[TOPN:])
+        others = sum(sorted(list(by_host.values()), reverse=True)[TOPN:])
         report += "[Others]".ljust(LJUST) + "|" + str(others).rjust(RJUST)
 
     report += "\n\n\n"
     report += "Receiver Name".ljust(LJUST) + "|" + "Count".rjust(RJUST) + "\n"
     report += "=" * LINELENGTH + "\n"
-    for rec in sorted(by_receiver.keys(), key=lambda x: by_receiver[x], reverse=True)[:TOPN]:
+    for rec in sorted(list(by_receiver.keys()), key=lambda x: by_receiver[x], reverse=True)[:TOPN]:
         report += rec.ljust(LJUST) + "|" + str(by_receiver[rec]).rjust(RJUST) + "\n"
     if len(by_receiver) > TOPN:
         report += "...".ljust(LJUST) + "|" + "...".rjust(RJUST) + "\n"
-        others = sum(sorted(by_receiver.values(), reverse=True)[TOPN:])
+        others = sum(sorted(list(by_receiver.values()), reverse=True)[TOPN:])
         report += "[Others]".ljust(LJUST) + "|" + str(others).rjust(RJUST) + "\n"
 
     report += "\n\n\n"
     report += "DKIM Signing Domain".ljust(LJUST) + "|" + "Count".rjust(RJUST) + "\n"
     report += "=" * LINELENGTH + "\n"
-    for domain in sorted(dkim_domains.keys(), key=lambda x: dkim_domains[x], reverse=True)[:TOPN]:
+    for domain in sorted(list(dkim_domains.keys()), key=lambda x: dkim_domains[x], reverse=True)[:TOPN]:
         report += domain.ljust(LJUST) + "|" + str(dkim_domains[domain]).rjust(RJUST) + "\n"
     if len(dkim_domains) > TOPN:
         report += "...".ljust(LJUST) + "|" + "...".rjust(RJUST) + "\n"
-        others = sum(sorted(dkim_domains.values(), reverse=True)[TOPN:])
+        others = sum(sorted(list(dkim_domains.values()), reverse=True)[TOPN:])
         report += "[Others]".ljust(LJUST) + "|" + str(others).rjust(RJUST) + "\n"
 
     report += "\n\n\n"
     report += "DMARC Status".ljust(LJUST) + "|" + "Count".rjust(RJUST) + "\n"
     report += "=" * LINELENGTH + "\n"
-    for rec in sorted(by_status.keys(), key=lambda x: by_status[x], reverse=True):
+    for rec in sorted(list(by_status.keys()), key=lambda x: by_status[x], reverse=True):
         report += rec.ljust(LJUST) + "|" + str(by_status[rec]).rjust(RJUST) + "\n"
 
     report += "\n\n\n"
     report += "Policy Applied".ljust(LJUST) + "|" + "Count".rjust(RJUST) + "\n"
     report += "=" * LINELENGTH + "\n"
-    for rec in sorted(by_disposition.keys(), key=lambda x: by_disposition[x], reverse=True):
+    for rec in sorted(list(by_disposition.keys()), key=lambda x: by_disposition[x], reverse=True):
         report += rec.ljust(LJUST) + "|" + str(by_disposition[rec]).rjust(RJUST) + "\n"
 
     if folder is not None:
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     # Choose the output folder:
     dest_folder = args.outputfolder if args.writefiles else None
     if dest_folder is None:
-        print "Not saving report or graphs to disk!"
+        print("Not saving report or graphs to disk!")
     if (dest_folder is not None) and (not os.path.exists(dest_folder)):
         os.makedirs(dest_folder)
 
@@ -183,8 +183,8 @@ if __name__ == "__main__":
     dkim_domains = sqlite_db.get_count_by_dkim_domain()
     by_status = sqlite_db.get_count_by_status_string()
 
-    print generate_report(n_reports, min_t, max_t, by_disposition, by_host, by_receiver,
-                          dkim_domains, by_status, dest_folder)
+    print(generate_report(n_reports, min_t, max_t, by_disposition, by_host, by_receiver,
+                          dkim_domains, by_status, dest_folder))
 
     # Produce graphs showing SPF status of messages:
     res = sqlite_db.get_raw_spf_status_count_by_timestamp()

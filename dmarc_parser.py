@@ -78,7 +78,7 @@ def _lookup_ip(ip_address):
     global _rdns_records
     if ip_address not in _rdns_records:
         try:
-            print "INFO: Looking up %s" % ip_address
+            print("INFO: Looking up %s" % ip_address)
             socket_info = socket.gethostbyaddr(ip_address)
             hostname = socket_info[0]
             _rdns_records[ip_address] = hostname
@@ -106,7 +106,7 @@ def _process_zipfile(fname):
     with zipfile.ZipFile(fname, 'r') as archive:
         for subfile_name in archive.namelist():
             if subfile_name.endswith(".xml"):
-                xml_file = archive.open(subfile_name, 'rU')
+                xml_file = archive.open(subfile_name, 'r')
                 # Assert only one valid XML file per ZIP file!
                 return _process_xml(xml_file, archive_name)
 
@@ -120,8 +120,22 @@ def _process_gzfile(fname):
             return _process_xml(gzipfile, archive_name)
 
 
+def parse_report(persistent_storage, root, fname):
+    report = None
+    if fname.endswith(".zip"):
+        report = _process_zipfile(root + "/" + fname)
+    elif fname.endswith(".gz"):
+        report = _process_gzfile(root + "/" + fname)
+    # Save any parsed report:
+    if report is not None:
+        persistent_storage.save_new_report(report)
+        return True
+    else:
+        return False
+
+
 def parse_reports_in_directory(persistent_storage, report_dir="./reports"):
-    print "INFO: Parsing all reports in directory."
+    print("INFO: Parsing all reports in directory.")
     n = 0
     n_new = 0
     for root, directories, files in os.walk(report_dir):
@@ -131,16 +145,9 @@ def parse_reports_in_directory(persistent_storage, report_dir="./reports"):
             if persistent_storage.report_already_exists(fname):
                 continue
             # If not, parse the file in correct manner:
-            report = None
-            if fname.endswith(".zip"):
-                report = _process_zipfile(root + "/" + fname)
-            elif fname.endswith(".gz"):
-                report = _process_gzfile(root + "/" + fname)
-            # Save any parsed report:
-            if report is not None:
+            if parse_report(persistent_storage, root, fname):
                 n_new += 1
-                persistent_storage.save_new_report(report)
-    print "INFO: Found %d file%s, parsed and saved %d new report%s." % (n, "" if n == 1 else "s", n_new, "" if n_new == 1 else "s")
+    print("INFO: Found %d file%s, parsed and saved %d new report%s." % (n, "" if n == 1 else "s", n_new, "" if n_new == 1 else "s"))
 
 
 def save_rdns_records(rdns_records, rdns_filename='rdns.pickle', rdns_directory="./results"):
@@ -148,7 +155,7 @@ def save_rdns_records(rdns_records, rdns_filename='rdns.pickle', rdns_directory=
     if not os.path.exists(rdns_directory):
             os.makedirs(rdns_directory)
     with open(filepath, "wb") as f:
-        print "INFO: Saving rDNS Records to File."
+        print("INFO: Saving rDNS Records to File.")
         pickle.dump(rdns_records, f)
 
 
@@ -156,10 +163,10 @@ def load_rdns_records(rdns_filename='rdns.pickle', rdns_directory="./results"):
     filepath = os.path.join(rdns_directory, rdns_filename)
     if os.path.isfile(filepath):
         with open(filepath) as f:
-            print "INFO: Loading Saved rDNS Records."
+            print("INFO: Loading Saved rDNS Records.")
             return pickle.load(f)
     else:
-        print "INFO: No rDNS Records to Load."
+        print("INFO: No rDNS Records to Load.")
         return dict()
 
 

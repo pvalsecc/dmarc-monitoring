@@ -8,3 +8,5 @@ results/
 password
 *.sqlite
 *.xml
+dmarc_pipe
+.venv/
