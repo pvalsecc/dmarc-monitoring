@@ -25,6 +25,8 @@ def __main__():
             finally:
                 os.remove(os.path.join(report_dir, report))
         persistent_storage.commit()
+    else:
+        exit(1)
 
 
 if __name__ == "__main__":
