@@ -1,4 +1,4 @@
 beautifulsoup4==4.6.3
 lxml==4.2.5
-matplotlib==3.0.0
-mysql-connector-python==8.0.12
+matplotlib==3.0.1
+mysql-connector-python==8.0.13
