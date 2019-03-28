@@ -20,12 +20,14 @@ def __main__():
     persistent_storage = DMARCStorage(user=args.user, password=args.password, host=args.host, database=args.database)
     if parse_email(sys.stdin.read(), report_dir, reports)[0]:
         for report in reports:
+            print("INFO: Processing " + report)
             try:
                 parse_report(persistent_storage, report_dir, report)
             finally:
                 os.remove(os.path.join(report_dir, report))
         persistent_storage.commit()
     else:
+        print("WARN: Found no attachment")
         exit(1)
 
 
